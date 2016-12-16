@@ -12,6 +12,7 @@ class Node extends Point
 {
     private int size;
     private int color;
+    private Point prePosition;
 
     Node(float x, float y, int size, int color)
     {

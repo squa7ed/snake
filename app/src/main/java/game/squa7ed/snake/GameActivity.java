@@ -1,51 +1,68 @@
 package game.squa7ed.snake;
 
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Window;
-import android.view.WindowManager;
+import android.util.Log;
 
 public class GameActivity extends Activity
 {
     private static final String TAG = Constants.DEBUG_TAG + "GameActivity";
-    private ViewRenderer renderer;
-    private Logic logic;
+    private GameField field;
+    private Worker worker;
+    private Thread workerThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        // Set fullscreen, no title, landscape.
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.layout_game);
         // Set layout parameters.
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         Constants.setParams(dm.widthPixels, dm.heightPixels);
-        GameField field = new GameField();
-        logic = new Logic(this, field);
-        renderer = new ViewRenderer(field, ((GameView) findViewById(R.id.gameView)).getHolder());
-        findViewById(R.id.speed_button).setOnTouchListener(logic);
-        findViewById(R.id.direction_button).setOnTouchListener(logic);
+        field = new GameField();
+        worker = new Worker(this, field);
+        workerThread = new Thread(worker);
+        findViewById(R.id.image_view_speed_background).setOnTouchListener(worker);
+        findViewById(R.id.image_view_direction_background).setOnTouchListener(worker);
     }
 
     @Override
     protected void onStart()
     {
         super.onStart();
-        if (renderer != null && !renderer.isRunning())
+        worker.setRunning(true);
+        if (workerThread == null)
         {
-            renderer.setRunning(true);
-            renderer.start();
+            workerThread = new Thread(worker);
         }
-        if (logic != null && !logic.isRunning())
+        if (workerThread.getState() == Thread.State.NEW)
         {
-            logic.setRunning(true);
-            logic.start();
+            workerThread.start();
         }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        worker.setRunning(false);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        try
+        {
+            workerThread.join();
+        } catch (InterruptedException e)
+        {
+            Log.e(TAG, "onDestroy: ", e);
+        }
+        workerThread = null;
+        worker = null;
+        field = null;
     }
 }

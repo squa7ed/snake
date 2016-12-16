@@ -13,6 +13,7 @@ public class Constants
     public static final int BACKGROUND_COLOR = Color.DKGRAY;
     public static final int FIELD_BACKGROUND_COLOR = Color.WHITE;
     public static final int FIELD_LINE_COLOR = Color.LTGRAY;
+    public static final int SNAKE_NAME_FONT_COLOR = Color.BLACK;
     public static final int SNAKE_LENGTH = 30;
     public static final int GROW_PER_FOOD = 5;
     public static final int SNAKE_SIZE = SNAKE_LENGTH / GROW_PER_FOOD;
@@ -46,10 +47,10 @@ public class Constants
     {
         screenWidth = width;
         screenHeight = height;
-        snakeBodySize = Math.min(screenWidth, screenHeight) / 50;
+        snakeBodySize = Math.min(screenWidth, screenHeight) / 30;
         snakeMoveDistance = snakeBodySize * 2 / 3;
-        deadSnakeBodySize = snakeBodySize * 2 / 3;
-        foodSize = snakeBodySize / 2;
+        deadSnakeBodySize = snakeBodySize / 2;
+        foodSize = snakeBodySize / 3;
         viewWidth = screenWidth * 2;
         viewHeight = screenHeight * 2;
         blankWidth = screenWidth / 4;

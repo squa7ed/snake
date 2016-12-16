@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Snake</string>
+    <string name="snake_length">Snake length</string>
+    <string name="snake_length_colon">Snake length:</string>
+    <string name="kill_count_colon">Kill count:</string>
+    <string name="ranking_list">Ranking</string>
+    <string name="today_best">Today\'s best</string>
+    <string name="numbers">1\n2\n3\n4\n5\n6\n7\n8\n9\n10</string>
 </resources>

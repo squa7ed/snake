@@ -13,6 +13,12 @@ class GameView extends SurfaceView implements SurfaceHolder.Callback
 {
     private static final String TAG = Constants.DEBUG_TAG + "GameView";
 
+    public GameView(Context context)
+    {
+        super(context);
+        getHolder().addCallback(this);
+    }
+
     GameView(Context context, AttributeSet attrs)
     {
         super(context, attrs);

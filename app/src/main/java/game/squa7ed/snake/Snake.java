@@ -118,4 +118,10 @@ class Snake extends LinkedList<Node>
         this.direction.setPosition(direction.getX() * Constants.snakeMoveDistance,
                                    direction.getY() * Constants.snakeMoveDistance);
     }
+
+    public void setDirection(float cos, float sin)
+    {
+        this.direction.setPosition(cos * Constants.snakeMoveDistance,
+                                   sin * Constants.snakeMoveDistance);
+    }
 }
