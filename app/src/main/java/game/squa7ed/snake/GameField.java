@@ -3,6 +3,8 @@ package game.squa7ed.snake;
 import android.graphics.Color;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +31,7 @@ class GameField
         foods = new ArrayList<>(Constants.FOOD_COUNT);
         direction = new Point(0, 0);
         position = new Point(0, 0);
-        mSnake = new Snake(Constants.SNAKE_NAME, id, getRandomColor(), false, getRandomPosition(), getRandomDirection());
+        mSnake = new Snake(Constants.DEFAULT_SNAKE_NAME, id, getRandomColor(), false, getRandomPosition(), getRandomDirection());
         tNode = new Node(mSnake.peekFirst());
         snakes.add(mSnake);
         makeupAISnakes(Constants.AI_SNAKE_COUNT);
@@ -41,7 +43,7 @@ class GameField
         for (int i = 0; i < count; i++)
         {
             id++;
-            snakes.add(new Snake("AI - " + id, id, getRandomColor(), true, getRandomPosition(), getRandomDirection()));
+            snakes.add(new Snake("AI-" + id, id, getRandomColor(), true, getRandomPosition(), getRandomDirection()));
         }
     }
 
@@ -92,11 +94,11 @@ class GameField
         Point d = snake.getDirection();
         Node head = snake.peekFirst();
         tNode.clone(head);
-        while (cnt < Constants.AI_CHECK_COUNT)
+        while (cnt < Constants.AI_DIRECTION_CHECK_COUNT)
         {
             cnt++;
-            //            10% chance of changing current direction.
-            if (Math.random() > 0.9)
+            //            10% chance of changing current direction if int's not hunting.
+            if (Math.random() > 0.9 && !snake.isHunting())
             {
                 snake.setDirection(getRandomDirection());
             }
@@ -104,6 +106,7 @@ class GameField
             if (!isValid(tNode))
             {
                 snake.setDirection(getRandomDirection());
+                cnt = 0;
                 continue;
             }
             boolean hasCollision = false;
@@ -185,6 +188,7 @@ class GameField
                                 {
                                     snake.eat(body);
                                     it.remove();
+                                    snake.hunt(tSnake);
                                 }
                             }
                         }
@@ -301,6 +305,18 @@ class GameField
     List<Snake> getSnakes()
     {
         return snakes;
+    }
+
+    void rank()
+    {
+        Collections.sort(snakes, new Comparator<Snake>()
+        {
+            @Override
+            public int compare(Snake aSnake, Snake bSnake)
+            {
+                return bSnake.getLength() - aSnake.getLength();
+            }
+        });
     }
 }
 

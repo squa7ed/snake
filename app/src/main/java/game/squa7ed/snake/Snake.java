@@ -6,122 +6,123 @@ import java.util.LinkedList;
  * Created by Squa7ed on 16-12-7.
  * Snake.
  */
-class Snake extends LinkedList<Node>
-{
+class Snake extends LinkedList<Node> {
     private final String name;
     private final int id;
     private final boolean isAi;
-    private boolean isAlive;
     private int length;
     private int killCount;
     private int speed;
+    private boolean hunting;
     private Point direction;
 
-    Snake(String name, int id, int color, boolean isAi, Point head, Point direction)
-    {
+    Snake(String name, int id, int color, boolean isAi, Point head, Point direction) {
         super();
         this.name = name;
         this.id = id;
         this.isAi = isAi;
-        this.isAlive = true;
-        this.length = Constants.SNAKE_LENGTH;
+        this.length = Constants.DEFAULT_SNAKE_LENGTH;
         this.killCount = 0;
         this.speed = Constants.DEFAULT_SPEED;
-        this.direction = new Point(0, 0);
+        this.hunting = false;
+        this.direction = new Point(0,0);
         setDirection(direction);
-        for (int i = 0; i < Constants.SNAKE_SIZE; i++)
-        {
+        for (int i = 0; i < Constants.DEFAULT_SNAKE_SIZE; i++) {
             add(new Node(head.getX() + i * this.direction.getX(),
-                         head.getY() + i * this.direction.getY(),
-                         Constants.snakeBodySize, color));
+                    head.getY() + i * this.direction.getY(),
+                    Constants.snakeBodySize, color));
         }
     }
 
-    void move()
-    {
-        for (int i = 0; i < speed; i++)
-        {
-            peekLast().setPosition(peekFirst().getX() + direction.getX(), peekFirst().getY() + direction.getY());
+    void move() {
+        for (int i = 0; i < speed; i++) {
+            peekLast().setPosition(peekFirst().getX() + direction.getX(),
+                    peekFirst().getY() + direction.getY());
             addFirst(removeLast());
         }
     }
 
-    void eat(Node food)
-    {
-        if (food.getSize() == Constants.foodSize)
-        {
+    void eat(Node food) {
+        if (food.getSize() == Constants.foodSize) {
             length++;
-            if (length % Constants.GROW_PER_FOOD == 0)
-            {
+            if (length % Constants.GROW_PER_FOOD == 0) {
                 add(new Node(peekLast()));
             }
-        } else
-        {
+        } else {
             length += Constants.SNAKE_BODY_FOOD_VALUE;
             add(food.clone(peekLast()));
         }
     }
 
-    void die()
-    {
-        isAlive = false;
-        for (Node body : this)
-        {
+    void die() {
+        length = 0;
+        for (Node body : this) {
             body.setSize(Constants.deadSnakeBodySize);
         }
-        //        Adjust head location if it's out of field.
-        Node head = peekFirst();
-        float x = head.getX(), y = head.getY();
-        int radius = head.getSize() / 2;
-        if (x - radius <= Constants.fieldLeft)
-        {
-            x += radius;
-        } else if (x + radius >= Constants.fieldRight)
-        {
-            x -= radius;
-        }
-        if (y - radius <= Constants.fieldTop)
-        {
-            y += radius;
-        } else if (y + radius >= Constants.fieldBottom)
-        {
-            y -= radius;
-        }
-        head.setPosition(x, y);
     }
 
-    String getName() { return name; }
+    String getName() {
+        return name;
+    }
 
-    int getId() { return id; }
+    int getId() {
+        return id;
+    }
 
-    boolean isAi() { return isAi; }
+    boolean isAi() {
+        return isAi;
+    }
 
-    boolean isAlive() { return isAlive; }
+    boolean isAlive() {
+        return length > 0;
+    }
 
-    int getLength() { return length; }
+    int getLength() {
+        return length;
+    }
 
-    int getKillCount() { return killCount; }
+    int getKillCount() {
+        return killCount;
+    }
 
-    int getSpeed() { return speed; }
+    void setSpeed(int speed) {
+        this.speed = speed;
+    }
 
-    void setSpeed(int speed) { this.speed = speed; }
+    void setKillCount() {
+        killCount++;
+    }
 
-    void setKillCount() { killCount++; }
-
-    public Point getDirection()
-    {
+    Point getDirection() {
         return direction;
     }
 
-    public void setDirection(Point direction)
-    {
-        this.direction.setPosition(direction.getX() * Constants.snakeMoveDistance,
-                                   direction.getY() * Constants.snakeMoveDistance);
+    void setDirection(Point direction) {
+        setDirection(direction.getX(), direction.getY());
     }
 
-    public void setDirection(float cos, float sin)
-    {
-        this.direction.setPosition(cos * Constants.snakeMoveDistance,
-                                   sin * Constants.snakeMoveDistance);
+
+    //TODO Make snakes unable to do sharp turns.
+    void setDirection(float cos, float sin) {
+        this.direction.setPosition(cos * Constants.snakeBodyDistance, sin * Constants.snakeBodyDistance);
+    }
+
+    void hunt(Snake snake) {
+        if (snake == null || snake.isEmpty()) {
+            hunting = false;
+            speed = Constants.DEFAULT_SPEED;
+            return;
+        }
+        hunting = true;
+        speed = Constants.ACCELERATE;
+        Node food = snake.iterator().next();
+        Node head = peekFirst();
+        float d = Constants.getDistanceBetween(head, food);
+        setDirection((food.getX() - head.getX()) / d,
+                (food.getY() - head.getY()) / d);
+    }
+
+    boolean isHunting() {
+        return hunting;
     }
 }

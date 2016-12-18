@@ -6,7 +6,8 @@
     <dimen name="indicator_size">30dp</dimen>
     <dimen name="indicator_background_size">100dp</dimen>
     <dimen name="speed_indicator_size">50dp</dimen>
-    <dimen name="small_text_size">8sp</dimen>
-    <dimen name="medium_text_size">9sp</dimen>
-    <dimen name="rank_list_width">80dp</dimen>
+    <dimen name="small_text_size">15sp</dimen>
+    <dimen name="medium_text_size">20sp</dimen>
+    <dimen name="large_text_size">25sp</dimen>
+    <dimen name="rank_list_width">200dp</dimen>
 </resources>

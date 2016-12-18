@@ -32,14 +32,16 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/snake_length_colon"/>
+                    android:text="@string/snake_length_colon"
+                    android:textSize="@dimen/large_text_size"/>
 
                 <TextView
                     android:id="@+id/text_snake_length"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/text_margin"
-                    android:text="@integer/default_snake_length"/>
+                    android:text="@integer/default_snake_length"
+                    android:textSize="@dimen/large_text_size"/>
             </LinearLayout>
 
             <LinearLayout
@@ -50,15 +52,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/text_margin"
-                    android:text="@string/kill_count_colon"/>
+                    android:layout_marginRight="@dimen/text_margin"
+                    android:text="@string/kill_count_colon"
+                    android:textSize="@dimen/large_text_size"/>
 
                 <TextView
                     android:id="@+id/text_kill_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/text_margin"
-                    android:text="@integer/default_kill_count"/>
+                    android:text="@integer/default_kill_count"
+                    android:textSize="@dimen/large_text_size"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -74,9 +78,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/text_margin"
                 android:background="@drawable/text_background"
+                android:gravity="center"
                 android:text="@string/ranking_list"
                 android:textAlignment="center"
-                android:textSize="@dimen/medium_text_size"/>
+                android:textSize="@dimen/large_text_size"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -88,58 +93,194 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="@string/today_best"
-                    android:textAlignment="center"
                     android:textSize="@dimen/medium_text_size"/>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin">
 
                     <TextView
                         android:id="@+id/text_today_best_name"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:text="Squa7ed"
                         android:textSize="@dimen/small_text_size"/>
 
                     <TextView
                         android:id="@+id/text_today_best_length"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="end"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:text="1000"
                         android:textSize="@dimen/small_text_size"/>
-                </LinearLayout>
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/text_margin"
                 android:background="@drawable/text_background"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/text_rank_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/numbers"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/small_text_size"/>
-
-                <TextView
-                    android:id="@+id/text_rank_name"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/text_margin"
-                    android:layout_marginRight="@dimen/text_margin"
-                    android:textSize="@dimen/small_text_size"/>
+                    android:layout_marginRight="@dimen/text_margin">
 
-                <TextView
-                    android:id="@+id/text_rank_length"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rank_list_1"
+                        android:text="@string/first"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_name_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_length_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:textSize="@dimen/small_text_size"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/small_text_size"/>
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rank_list_2"
+                        android:text="@string/second"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_name_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_length_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:textSize="@dimen/small_text_size"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rank_list_3"
+                        android:text="@string/third"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_name_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_length_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:textSize="@dimen/small_text_size"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fourth"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_name_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_length_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:textSize="@dimen/small_text_size"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fifth"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_name_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/small_text_size"/>
+
+                    <TextView
+                        android:id="@+id/rank_list_length_5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:textSize="@dimen/small_text_size"/>
+                </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">贪吃蛇</string>
+    <string name="kill_count_colon">击杀：</string>
+    <string name="snake_length">长度</string>
+    <string name="snake_length_colon">长度：</string>
+    <string name="today_best">今日最佳</string>
+    <string name="ranking_list">排行榜</string>
+</resources>

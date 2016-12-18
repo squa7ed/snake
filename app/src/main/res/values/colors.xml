@@ -7,4 +7,7 @@
     <color name="text_background">#55999999</color>
     <color name="indicator">#FF999999</color>
     <color name="indicator_pressed">#FF000000</color>
+    <color name="gold">#7FFFD700</color>
+    <color name="silver">#7FC0C0C0</color>
+    <color name="copper">#7FB87333</color>
 </resources>

@@ -4,6 +4,10 @@
     <string name="snake_length_colon">Snake length:</string>
     <string name="kill_count_colon">Kill count:</string>
     <string name="ranking_list">Ranking</string>
-    <string name="today_best">Today\'s best</string>
-    <string name="numbers">1\n2\n3\n4\n5\n6\n7\n8\n9\n10</string>
+    <string name="today_best">Today`s best</string>
+    <string name="first" translatable="false">1st</string>
+    <string name="second" translatable="false">2nd</string>
+    <string name="third" translatable="false">3rd</string>
+    <string name="fourth" translatable="false">4th</string>
+    <string name="fifth" translatable="false">5th</string>
 </resources>

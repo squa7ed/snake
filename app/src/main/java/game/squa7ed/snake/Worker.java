@@ -4,14 +4,18 @@ import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,9 +31,15 @@ class Worker extends Handler implements View.OnTouchListener, Runnable
     private final Snake mSnake;
     private final ImageView dIndicator;
     private final ImageView sIndicator;
+    private final TextView textViewSnakeLength;
+    private final TextView textViewKillCount;
+    private final TextView[] rankNames;
+    private final TextView[] rankLengths;
     private final SurfaceHolder surfaceHolder;
+    private final Paint paint;
     private boolean running;
-    private float left, top;
+    private float left;
+    private float top;
 
     Worker(Activity activity, GameField field)
     {
@@ -39,67 +49,128 @@ class Worker extends Handler implements View.OnTouchListener, Runnable
         mSnake = field.getSnake();
         dIndicator = (ImageView) activity.findViewById(R.id.image_view_direction_indicator);
         sIndicator = (ImageView) activity.findViewById(R.id.image_view_speed_indicator);
+        textViewSnakeLength = (TextView) activity.findViewById(R.id.text_snake_length);
+        textViewKillCount = (TextView) activity.findViewById(R.id.text_kill_count);
+        rankNames = new TextView[]
+                {
+                        (TextView) activity.findViewById(R.id.rank_list_name_1),
+                        (TextView) activity.findViewById(R.id.rank_list_name_2),
+                        (TextView) activity.findViewById(R.id.rank_list_name_3),
+                        (TextView) activity.findViewById(R.id.rank_list_name_4),
+                        (TextView) activity.findViewById(R.id.rank_list_name_5),
+                        };
+        rankLengths = new TextView[]
+                {
+                        (TextView) activity.findViewById(R.id.rank_list_length_1),
+                        (TextView) activity.findViewById(R.id.rank_list_length_2),
+                        (TextView) activity.findViewById(R.id.rank_list_length_3),
+                        (TextView) activity.findViewById(R.id.rank_list_length_4),
+                        (TextView) activity.findViewById(R.id.rank_list_length_5),
+                        };
         surfaceHolder = ((GameView) activity.findViewById(R.id.gameView)).getHolder();
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
     public void run()
     {
-        long t, tt = 0L, st;
-        Canvas canvas;
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(Constants.snakeBodySize);
+        long st, tt = 0;
         while (running)
         {
             Log.d(TAG, "run: thread sleep for " + (System.currentTimeMillis() - tt) + " ms.");
             st = System.currentTimeMillis();
-            field.move();
-            field.check();
-            Log.d(TAG, "run: game logic in " + (System.currentTimeMillis() - st) + " ms.");
-            synchronized (surfaceHolder)
-            {
-                if ((canvas = surfaceHolder.lockCanvas()) != null)
-                {
-                    t = System.currentTimeMillis();
-                    tt = t;
-                    translate(canvas);
-                    Log.d(TAG, "run: draw translate in " + (System.currentTimeMillis() - tt) + " ms.");
-                    tt = System.currentTimeMillis();
-                    drawLayer(canvas, paint);
-                    Log.d(TAG, "run: draw layer in " + (System.currentTimeMillis() - tt) + " ms.");
-                    tt = System.currentTimeMillis();
-                    drawList(foods, canvas, paint);
-                    Log.d(TAG, "run: draw foods in " + (System.currentTimeMillis() - tt) + " ms.");
-                    tt = System.currentTimeMillis();
-                    for (Snake snake : snakes)
-                    {
-                        drawList(snake, canvas, paint);
-                        if (snake.isAlive() && needDrawing(snake.peekFirst()))
-                        {
-                            Node head = snake.peekFirst();
-                            paint.setColor(Constants.SNAKE_NAME_FONT_COLOR);
-                            canvas.drawText(snake.getName(), head.getX(), head.getY() - head.getSize(), paint);
-                            paint.setColor(Color.WHITE);
-                            canvas.drawCircle(head.getX(), head.getY(), head.getSize() / 3, paint);
-                            paint.setColor(Color.BLACK);
-                            canvas.drawCircle(head.getX(), head.getY(), head.getSize() / 4, paint);
-                        }
-                        Log.d(TAG, "run: draw snakes in " + (System.currentTimeMillis() - tt) + " ms.");
-                    }
-                    surfaceHolder.unlockCanvasAndPost(canvas);
-                    Log.d(TAG, "run: draw all in " + (System.currentTimeMillis() - t) + " ms.");
-                    Log.d(TAG, "run: all done in " + (System.currentTimeMillis() - st) + " ms.");
-                }
-            }
+            tt = System.currentTimeMillis();
+            // Game logic
+            logic();
+            Log.d(TAG, "run: logic in " + (System.currentTimeMillis() - tt) + " ms.");
+            tt = System.currentTimeMillis();
+            // Update layout, set rank, snake length, kill count etc.
+            update();
+            Log.d(TAG, "run: update in " + (System.currentTimeMillis() - tt) + " ms.");
+            tt = System.currentTimeMillis();
+            // Draw game field, foods, snakes.
+            draw();
+            Log.d(TAG, "run: draw in " + (System.currentTimeMillis() - tt) + " ms.");
             try
             {
                 tt = System.currentTimeMillis();
-                Thread.sleep(Math.max(0, Constants.SLEEP - System.currentTimeMillis() + st));
+                Thread.sleep(Math.max(0, Constants.THREAD_SLEEP - System.currentTimeMillis() + st));
             } catch (InterruptedException e)
             {
                 Log.e(TAG, "run: ", e);
+            }
+        }
+    }
+
+    private void logic()
+    {
+        field.move();
+        field.check();
+        field.rank();
+    }
+
+    private void update()
+    {
+        setRank();
+        setLengthAndKillCount();
+    }
+
+    private void setRank()
+    {
+        Message msg = new Message();
+        msg.what = Constants.MSG_SET_RANK;
+        Bundle data = new Bundle();
+        ArrayList<CharSequence> names = new ArrayList<>(5);
+        ArrayList<CharSequence> length = new ArrayList<>(5);
+        for (int i = 0; i < 5; i++)
+        {
+            names.add(snakes.get(i).getName());
+            length.add(String.valueOf(snakes.get(i).getLength()));
+        }
+        data.putCharSequenceArrayList(Constants.RANK_SNAKE_NAMES, names);
+        data.putCharSequenceArrayList(Constants.RANK_SNAKE_LENGTH, length);
+        msg.setData(data);
+        synchronized (this) {sendMessage(msg);}
+    }
+
+    private void setLengthAndKillCount()
+    {
+        Message msg = new Message();
+        msg.what = Constants.MSG_LENGTH_AND_KILL_COUNT;
+        Bundle data = new Bundle();
+        data.putInt(Constants.LENGTH, mSnake.getLength());
+        data.putInt(Constants.KILL_COUNT, mSnake.getKillCount());
+        msg.setData(data);
+        synchronized (this) {sendMessage(msg);}
+    }
+
+    private void draw()
+    {
+        Canvas canvas;
+        synchronized (surfaceHolder)
+        {
+            if ((canvas = surfaceHolder.lockCanvas()) != null)
+            {
+                translate(canvas);
+                drawLayer(canvas);
+                drawList(foods, canvas);
+                for (Snake snake : snakes)
+                {
+                    drawList(snake, canvas);
+                    if (snake.isAlive() && needDrawing(snake.peekFirst()))
+                    {
+                        paint.setTextAlign(Paint.Align.CENTER);
+                        paint.setTextSize(Constants.snakeBodySize * 2 / 3);
+                        Node head = snake.peekFirst();
+                        paint.setColor(Constants.SNAKE_NAME_FONT_COLOR);
+                        canvas.drawText(snake.getName(), head.getX(), head.getY() - head.getSize(), paint);
+                        paint.setColor(Color.WHITE);
+                        canvas.drawCircle(head.getX(), head.getY(), head.getSize() / 3, paint);
+                        paint.setColor(Color.BLACK);
+                        canvas.drawCircle(head.getX(), head.getY(), head.getSize() / 4, paint);
+                    }
+                }
+                surfaceHolder.unlockCanvasAndPost(canvas);
             }
         }
     }
@@ -134,18 +205,15 @@ class Worker extends Handler implements View.OnTouchListener, Runnable
         canvas.translate(-left, -top);
     }
 
-    private void drawLayer(Canvas canvas, Paint paint)
+    private void drawLayer(Canvas canvas)
     {
-        long t = System.currentTimeMillis();
         //        Draw blank areas.
-        paint.setColor(Constants.BACKGROUND_COLOR);
+        paint.setColor(Constants.BLANK_ZONE_BACKGROUND_COLOR);
         //         Upper blank area.
         if (top < Constants.fieldTop)
         {
             canvas.drawRect(0, 0, Constants.viewWidth, Constants.blankHeight, paint);
         }
-        Log.d(TAG, "drawLayer: draw upper in " + (System.currentTimeMillis() - t) + " ms.");
-        t = System.currentTimeMillis();
         //        Right blank area.
         if (left + Constants.screenWidth > Constants.fieldRight)
         {
@@ -154,30 +222,23 @@ class Worker extends Handler implements View.OnTouchListener, Runnable
                             Constants.viewWidth,
                             Constants.viewHeight, paint);
         }
-        Log.d(TAG, "drawLayer: draw right in " + (System.currentTimeMillis() - t) + " ms.");
-        t = System.currentTimeMillis();
         //        Bottom blank area.
         if (top + Constants.screenHeight > Constants.fieldBottom)
         {
             canvas.drawRect(0, Constants.fieldBottom, Constants.fieldRight, Constants.viewHeight, paint);
         }
-        Log.d(TAG, "drawLayer: draw bottom in " + (System.currentTimeMillis() - t) + " ms.");
-        t = System.currentTimeMillis();
         //        Left blank area.
         if (left < Constants.fieldLeft)
         {
             canvas.drawRect(0, Constants.blankHeight, Constants.fieldLeft, Constants.fieldBottom, paint);
         }
-        Log.d(TAG, "drawLayer: draw left in " + (System.currentTimeMillis() - t) + " ms.");
         //        Draw field.
         paint.setColor(Constants.FIELD_BACKGROUND_COLOR);
-        t = System.currentTimeMillis();
         canvas.drawRect(left < Constants.fieldLeft ? Constants.fieldLeft : left,
                         top < Constants.fieldTop ? Constants.fieldTop : top,
                         left + Constants.screenWidth < Constants.fieldRight ? left + Constants.screenWidth : Constants.fieldRight,
                         top + Constants.screenHeight < Constants.fieldBottom ? top + Constants.screenHeight : Constants.fieldBottom,
                         paint);
-        Log.d(TAG, "drawLayer: draw field in " + (System.currentTimeMillis() - t) + " ms.");
         //        Draw field lines.
         int x = (Constants.fieldWidth % Constants.gap) / 2;
         int y = (Constants.fieldHeight % Constants.gap) / 2;
@@ -192,10 +253,9 @@ class Worker extends Handler implements View.OnTouchListener, Runnable
         {
             canvas.drawLine(Constants.fieldLeft, y, Constants.fieldRight, y, paint);
         }
-        Log.d(TAG, "drawLayer: draw lines in " + (System.currentTimeMillis() - t) + " ms.");
     }
 
-    private void drawList(List<Node> list, Canvas canvas, Paint paint)
+    private void drawList(List<Node> list, Canvas canvas)
     {
         for (Node node : list)
         {
@@ -208,10 +268,10 @@ class Worker extends Handler implements View.OnTouchListener, Runnable
 
     private boolean needDrawing(Node node)
     {
-        return node.getX() >= left - node.getSize() / 2 &&
+        return node.getX() >= left - node.getSize() + node.getSize() &&
                node.getX() <= left + Constants.screenWidth &&
-               node.getY() >= top - node.getSize() / 2 &&
-               node.getY() <= top + Constants.screenHeight;
+               node.getY() >= top - node.getSize() &&
+               node.getY() <= top + Constants.screenHeight + node.getSize();
     }
 
     void setRunning(boolean running)
@@ -274,6 +334,41 @@ class Worker extends Handler implements View.OnTouchListener, Runnable
     @Override
     public void dispatchMessage(Message msg)
     {
-        super.dispatchMessage(msg);
+        switch (msg.what)
+        {
+            case Constants.MSG_LENGTH_AND_KILL_COUNT:
+                setLengthAndKillCount(msg);
+                break;
+            case Constants.MSG_SET_RANK:
+                setRank(msg);
+                break;
+            default:
+                super.dispatchMessage(msg);
+                break;
+        }
+    }
+
+    private void setRank(Message msg)
+    {
+        Bundle bundle = msg.getData();
+        ArrayList<CharSequence> names = bundle.getCharSequenceArrayList(Constants.RANK_SNAKE_NAMES);
+        ArrayList<CharSequence> length = bundle.getCharSequenceArrayList(Constants.RANK_SNAKE_LENGTH);
+        if (length != null && names != null)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                rankNames[i].setText(names.get(i));
+                rankLengths[i].setText(length.get(i));
+            }
+        }
+    }
+
+    private void setLengthAndKillCount(Message msg)
+    {
+        Bundle bundle = msg.getData();
+        int length = bundle.getInt(Constants.LENGTH);
+        int killCount = bundle.getInt(Constants.KILL_COUNT);
+        textViewSnakeLength.setText(String.valueOf(length));
+        textViewKillCount.setText(String.valueOf(killCount));
     }
 }

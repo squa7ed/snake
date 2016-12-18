@@ -23,7 +23,6 @@ public class GameActivity extends Activity
         Constants.setParams(dm.widthPixels, dm.heightPixels);
         field = new GameField();
         worker = new Worker(this, field);
-        workerThread = new Thread(worker);
         findViewById(R.id.image_view_speed_background).setOnTouchListener(worker);
         findViewById(R.id.image_view_direction_background).setOnTouchListener(worker);
     }
@@ -32,36 +31,30 @@ public class GameActivity extends Activity
     protected void onStart()
     {
         super.onStart();
+        workerThread = new Thread(worker);
         worker.setRunning(true);
-        if (workerThread == null)
-        {
-            workerThread = new Thread(worker);
-        }
-        if (workerThread.getState() == Thread.State.NEW)
-        {
-            workerThread.start();
-        }
+        workerThread.start();
     }
 
     @Override
-    protected void onPause()
+    protected void onStop()
     {
-        super.onPause();
+        super.onStop();
         worker.setRunning(false);
+        try
+        {
+            workerThread.join();
+        } catch (InterruptedException e)
+        {
+            Log.e(TAG, "onStop: ", e);
+        }
+        workerThread = null;
     }
 
     @Override
     protected void onDestroy()
     {
         super.onDestroy();
-        try
-        {
-            workerThread.join();
-        } catch (InterruptedException e)
-        {
-            Log.e(TAG, "onDestroy: ", e);
-        }
-        workerThread = null;
         worker = null;
         field = null;
     }

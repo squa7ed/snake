@@ -15,6 +15,11 @@ class Point
         this.y = y;
     }
 
+    Point(Point point)
+    {
+        this(point.getX(), point.getY());
+    }
+
     float getX()
     {
         return x;
